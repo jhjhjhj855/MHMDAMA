@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حسابات الأنسولين التقديرية لمرضى السكري النوع الأول</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            direction: rtl; /* Set direction to right-to-left for Arabic */
+            text-align: right; /* Align text to the right */
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        h2 {
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        .section-description {
+            font-size: 1.05em;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .result {
+            background-color: #e6ffe6;
+            border: 1px solid #aaffaa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #28a745;
+            text-align: center;
+        }
+        .info-message {
+            background-color: #e7f3fe;
+            border: 1px solid #cce5ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1em;
+            color: #007bff;
+            text-align: center;
+        }
+        .warning-message {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 1em;
+            color: #856404;
+            text-align: center;
+        }
+        .note {
+            background-color: #f9f9f9;
+            border-left: 5px solid #007bff;
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 5px;
+            color: #555;
+            line-height: 1.6;
+        }
+        .note ul {
+            list-style-type: disc;
+            padding-right: 20px;
+        }
+        .note li {
+            margin-bottom: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #777;
+            font-size: 0.9em;
+        }
+        .columns {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .column {
+            flex: 1;
+        }
+    </style>
+</head><link rel="manifest" href="/manifest.json">
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    }
+</script>
+<body>
+    <div class="container">
+        <h1>حسابات الأنسولين التقديرية لمرضى السكري من النوع الأول</h1>
+        <p class="section-description" style="text-align: center;">
+            مرحباً بكم في تطبيق <strong>كروب أطفال السكري النوع الأول في العراق</strong><br>
+            يرجى العلم أن هذه الحسابات هي تقديرية ومساعدة فقط. يجب دائمًا استشارة طبيب مختص أو أخصائي سكري لتحديد الجرعات المناسبة لطفلك.
+        </p>
+
+        ---
+
+        <h2>1. حساب معامل الكربوهيدرات (Carb Ratio)</h2>
+        <p class="section-description">معامل الكربوهيدرات هو عدد جرامات الكربوهيدرات التي تغطيها وحدة واحدة من الأنسولين سريع المفعول.</p>
+
+        <div class="columns">
+            <div class="column">
+                <label for="weightCarb">أدخل وزن الطفل (بالكيلوغرام):</label>
+                <input type="number" id="weightCarb" min="0" step="0.01" oninput="calculateCarbRatio()">
+            </div>
+            <div class="column">
+                <label for="totalInsulinCarb">أو أدخل مجموع جرعات الأنسولين الكلية اليومية (بالوحدات):</label>
+                <input type="number" id="totalInsulinCarb" min="0" step="0.01" oninput="calculateCarbRatio()">
+            </div>
+        </div>
+        <div id="carbRatioResult" class="result" style="display: none;"></div>
+        <div id="carbRatioInfo" class="info-message">الرجاء إدخال وزن الطفل أو مجموع جرعات الأنسولين الكلية لحساب معامل الكربوهيدرات.</div>
+        <div id="carbRatioWarning" class="warning-message" style="display: none;"></div>
+
+        ---
+
+        <h2>2. حساب معامل التصحيح (Correction Factor / Insulin Sensitivity Factor)</h2>
+        <p class="section-description">معامل التصحيح هو عدد النقاط (ملغ/دل أو مل مول/لتر) التي تخفضها وحدة واحدة من الأنسولين سريع المفعول.</p>
+
+        <div class="columns">
+            <div class="column">
+                <label for="weightCorrection">أدخل وزن الطفل (بالكيلوغرام):</label>
+                <input type="number" id="weightCorrection" min="0" step="0.01" oninput="calculateCorrectionFactor()">
+            </div>
+            <div class="column">
+                <label for="totalInsulinCorrection">أو أدخل مجموع جرعات الأنسولين الكلية اليومية (بالوحدات):</label>
+                <input type="number" id="totalInsulinCorrection" min="0" step="0.01" oninput="calculateCorrectionFactor()">
+            </div>
+        </div>
+        <div id="correctionFactorResult" class="result" style="display: none;"></div>
+        <div id="correctionFactorInfo" class="info-message">الرجاء إدخال وزن الطفل أو مجموع جرعات الأنسولين الكلية لحساب معامل التصحيح.</div>
+        <div id="correctionFactorWarning" class="warning-message" style="display: none;"></div>
+
+        ---
+
+        <h2>3. حساب معامل الرفع (Carb Impact on Blood Sugar)</h2>
+        <p class="section-description">معامل الرفع هو مقدار ارتفاع مستوى السكر في الدم المتوقع لكل 1 جرام من الكربوهيدرات. يمكن حساب هذا المعامل يدويًا من خلال قسمة معامل التصحيح على معامل الكربوهيدرات.</p>
+
+        <div class="columns">
+            <div class="column">
+                <label for="manualCorrectionFactor">أدخل معامل التصحيح (يدويًا):</label>
+                <input type="number" id="manualCorrectionFactor" min="0" step="0.01" oninput="calculateCarbImpact()">
+            </div>
+            <div class="column">
+                <label for="manualCarbRatio">أدخل معامل الكربوهيدرات (يدويًا):</label>
+                <input type="number" id="manualCarbRatio" min="0" step="0.01" oninput="calculateCarbImpact()">
+            </div>
+        </div>
+        <div id="carbImpactResult" class="result" style="display: none;"></div>
+        <div id="carbImpactInfo" class="info-message">الرجاء إدخال معامل التصحيح ومعامل الكربوهيدرات يدويًا لحساب معامل الرفع.</div>
+        <div id="carbImpactWarning" class="warning-message" style="display: none;"></div>
+
+        ---
+
+        <div class="note">
+            <h3>ملاحظات طبية مهمة:</h3>
+            <ul>
+                <li><strong>هذه الحسابات هي تقديرية:</strong> القيم المحسوبة هنا هي نقاط بداية عامة (مثل قاعدة 500 للكربوهيدرات وقاعدة 1700 للتصحيح). هذه القواعد هي أدوات إرشادية وقد لا تنطبق بدقة على كل طفل.</li>
+                <li><strong>الحاجة إلى التخصيص:</strong> احتياجات الأنسولين ومعاملات الكربوهيدرات والتصحيح تختلف بشكل كبير من طفل لآخر وتتغير بمرور الوقت بسبب عوامل مثل العمر، النمو، النشاط البدني، التغيرات الهرمونية، والمرض.</li>
+                <li><strong>استشارة المختص:</strong> يجب دائمًا مراجعة فريق الرعاية الصحية المختص (طبيب الغدد الصماء، أخصائي السكري، أخصائي التغذية) لتحديد وتعديل جرعات الأنسولين ومعاملاته بناءً على المراقبة المستمرة لمستويات السكر في الدم، أنماط الأكل، والنشاط البدني.</li>
+                <li><strong>المراقبة المستمرة:</strong> من الضروري مراقبة مستويات السكر في الدم بانتظام لتقييم فعالية الجرعات وتعديلها حسب الحاجة.</li>
+                <li><strong>لا تستخدم هذه الأداة كبديل للمشورة الطبية المهنية.</strong></li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p><strong>كروب أطفال السكري النوع الأول في العراق</strong></p>
+            <p>نتمنى لكم دوام الصحة والعافية!</p>
+        </div>
+    </div>
+
+    <script>
+        function calculateCarbRatio() {
+            const weight = parseFloat(document.getElementById('weightCarb').value);
+            const totalInsulin = parseFloat(document.getElementById('totalInsulinCarb').value);
+            const resultDiv = document.getElementById('carbRatioResult');
+            const infoDiv = document.getElementById('carbRatioInfo');
+            const warningDiv = document.getElementById('carbRatioWarning');
+
+            resultDiv.style.display = 'none';
+            infoDiv.style.display = 'none';
+            warningDiv.style.display = 'none';
+
+            let carbRatio = null;
+
+            if (!isNaN(weight) && weight > 0 && (isNaN(totalInsulin) || totalInsulin === 0)) {
+                carbRatio = 500 / weight;
+            } else if (!isNaN(totalInsulin) && totalInsulin > 0 && (isNaN(weight) || weight === 0)) {
+                carbRatio = 500 / totalInsulin;
+            } else if (!isNaN(weight) && weight > 0 && !isNaN(totalInsulin) && totalInsulin > 0) {
+                warningDiv.textContent = "الرجاء إدخال إما وزن الطفل أو مجموع جرعات الأنسولين الكلية، وليس كليهما، لحساب معامل الكربوهيدرات.";
+                warningDiv.style.display = 'block';
+                return;
+            } else if ((isNaN(weight) || weight === 0) && (isNaN(totalInsulin) || totalInsulin === 0)) {
+                infoDiv.style.display = 'block';
+                return;
+            }
+            
+            if (carbRatio !== null) {
+                resultDiv.textContent = `معامل الكربوهيدرات التقديري: ${carbRatio.toFixed(2)} جرام كربوهيدرات/وحدة أنسولين`;
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        function calculateCorrectionFactor() {
+            const weight = parseFloat(document.getElementById('weightCorrection').value);
+            const totalInsulin = parseFloat(document.getElementById('totalInsulinCorrection').value);
+            const resultDiv = document.getElementById('correctionFactorResult');
+            const infoDiv = document.getElementById('correctionFactorInfo');
+            const warningDiv = document.getElementById('correctionFactorWarning');
+
+            resultDiv.style.display = 'none';
+            infoDiv.style.display = 'none';
+            warningDiv.style.display = 'none';
+
+            let correctionFactor = null;
+
+            if (!isNaN(weight) && weight > 0 && (isNaN(totalInsulin) || totalInsulin === 0)) {
+                correctionFactor = 1700 / weight;
+            } else if (!isNaN(totalInsulin) && totalInsulin > 0 && (isNaN(weight) || weight === 0)) {
+                correctionFactor = 1700 / totalInsulin;
+            } else if (!isNaN(weight) && weight > 0 && !isNaN(totalInsulin) && totalInsulin > 0) {
+                warningDiv.textContent = "الرجاء إدخال إما وزن الطفل أو مجموع جرعات الأنسولين الكلية، وليس كليهما، لحساب معامل التصحيح.";
+                warningDiv.style.display = 'block';
+                return;
+            } else if ((isNaN(weight) || weight === 0) && (isNaN(totalInsulin) || totalInsulin === 0)) {
+                infoDiv.style.display = 'block';
+                return;
+            }
+
+            if (correctionFactor !== null) {
+                resultDiv.textContent = `معامل التصحيح التقديري: ${correctionFactor.toFixed(2)} ملغ/دل (أو مل مول/لتر) /وحدة أنسولين`;
+                resultDiv.style.display = 'block';
+            }
+        }
+
+        function calculateCarbImpact() {
+            const correctionFactor = parseFloat(document.getElementById('manualCorrectionFactor').value);
+            const carbRatio = parseFloat(document.getElementById('manualCarbRatio').value);
+            const resultDiv = document.getElementById('carbImpactResult');
+            const infoDiv = document.getElementById('carbImpactInfo');
+            const warningDiv = document.getElementById('carbImpactWarning');
+
+            resultDiv.style.display = 'none';
+            infoDiv.style.display = 'none';
+            warningDiv.style.display = 'none';
+
+            if (!isNaN(correctionFactor) && correctionFactor > 0 && !isNaN(carbRatio) && carbRatio > 0) {
+                const carbImpact = correctionFactor / carbRatio;
+                resultDiv.textContent = `معامل الرفع التقديري: ${carbImpact.toFixed(2)} ملغ/دل (أو مل مول/لتر) /جرام كربوهيدرات`;
+                resultDiv.style.display = 'block';
+            } else if (carbRatio === 0 && !isNaN(correctionFactor) && correctionFactor > 0) {
+                warningDiv.textContent = "معامل الكربوهيدرات لا يمكن أن يكون صفرًا عند حساب معامل الرفع.";
+                warningDiv.style.display = 'block';
+            } else {
+                infoDiv.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
